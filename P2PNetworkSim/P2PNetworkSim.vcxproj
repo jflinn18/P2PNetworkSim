@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClInclude Include="Network.h" />
     <ClInclude Include="Nodes.h" />
+    <ClInclude Include="Simulation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
