@@ -5,13 +5,16 @@
 #include <map>
 #include <set>
 #include <iterator>
-#include <random>
-#include <time.h>
+#include <stdlib.h>
 
 using namespace std;
 
 map<unsigned int, int> globalDatabase;
 int maxRedundancy = 1;
+
+void clearGlobalDatabase() {
+	globalDatabase.clear();
+}
 
 class Node{
 
@@ -23,7 +26,6 @@ public:
 	Node(int nodeID) { 
 		this->nodeID = nodeID; //assigns name to node
 
-		srand(time(NULL));
 		int max = 20; //max size of the local database in the node
 		int min = 5;  //min size of the local database in the node
 		int databaseSize = rand() % (max - min + 1) + min; //the randomly generated size of the local database in the node
@@ -51,6 +53,7 @@ public:
 	}
 	
 	int getNodeID() { return nodeID; }
+	set<unsigned int>* getNodeDatabase() { return &database; }
 };
 
 #endif

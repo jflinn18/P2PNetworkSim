@@ -14,9 +14,9 @@ private:
 	map<int, Node*> nodeMap;
 	vector<Node*> sleepingNodes;
 	
-public:
 
-	Network() {	}
+public: 
+	Network() {}
 
 	// Deletes all of the node pointers in the network
 	~Network() {
@@ -44,6 +44,7 @@ public:
 
 	map<int, Node*> getNodes() {return nodeMap;}
 	Node* getNode(int nodeID) {return nodeMap[nodeID];}
+	int getNodeMapSize() { return nodeMap.size(); }
 
 };
 
