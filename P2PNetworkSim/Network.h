@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <stdlib.h>
 #include "Nodes.h"
 
 
@@ -31,9 +32,9 @@ public:
 		nodeMap.insert(pair<int, Node*>(name, n));
 	}
 
-	// "removes" a node from the simulated p2p network
+	// "disconnects" a node from the simulated p2p network
 	// Moves the disconnected node to a vector of sleeping nodes. (They may reconnect later in the simulation)
-	void removeNode(int nameID) {
+	void disconnectNode(int nameID) {
 		if (nodeMap[nameID]) {  // checks to make sure the node is in the network. 
 			sleepingNodes.push_back(nodeMap[nameID]);
 			nodeMap.erase(nameID);
@@ -42,9 +43,24 @@ public:
 			cout << "Sorry. Node is not in the map.\n"; // handles the situation where the node is not in the network. 
 	}
 
+	// "reconnects" a node by moving it from the sleepingNodes to the nodeMap
+	void reconnectNode() {
+		if (sleepingNodes.size() != 0) {
+			int randNode = rand() % sleepingNodes.size();
+			
+			nodeMap.insert(pair<int, Node*>(sleepingNodes[randNode]->getNodeID(), sleepingNodes[randNode]));
+
+			// make sure that this is erasing the index that is being used above
+			sleepingNodes.erase(sleepingNodes.begin() + randNode);
+		}
+		else
+			std::cout << "No nodes in sleepingNodes\n";
+	}
+
 	map<int, Node*> getNodes() {return nodeMap;}
 	Node* getNode(int nodeID) {return nodeMap[nodeID];}
 	int getNodeMapSize() { return nodeMap.size(); }
+	int getSleepingNodeSize() { return sleepingNodes.size(); }
 
 };
 

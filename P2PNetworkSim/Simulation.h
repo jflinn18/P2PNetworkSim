@@ -16,9 +16,14 @@ private:
 public: 
 
 	Simulation(int initNetSize, int redundancyRate) {
+		if (initNetSize < redundancyRate) {
+			cout << "Redundancy Rate must be <= to initNetSize given the defn of Set\n";
+			exit(0);
+		}
 		this->initNetSize = initNetSize;
 		this->redundancyRate = redundancyRate;
 		srand(time(NULL));
+		
 	}
 
 	// runs one of the simulations given a choice. 
@@ -45,6 +50,7 @@ public:
 
 	// simOne will be running a simulation that takes a fixed diconnection probability 
 	//   and fixed data redundancy rate and shows the relationship
+	//	 we assume that only sleeping nodes will connect to the network after the simulation has begun, no new nodes
 	void simOne() {
 		clearGlobalDatabase();
 
@@ -54,11 +60,10 @@ public:
 		}
 		checkDups(n1);
 
-		// clock tick simulation
-		//     nodes can disconnect or reconnect or do nothing at each clock tick. 
-		//     nodes cannot reconnect if there are no nodes in the sleeping nodes vector.
-
-
+		// two for-loops:
+		//		outer loop --> redundancy rate changing
+		//		inner loop --> disconnection rate increasing
+		//		
 		
 	}
 
@@ -67,6 +72,32 @@ public:
 	void simTwo() {
 		clearGlobalDatabase();
 	// run simOne passing in a random disconnection probability
+
+	// clock tick simulation
+	//     nodes can disconnect or reconnect or do nothing at each clock tick. 
+	//     nodes cannot reconnect if there are no nodes in the sleeping nodes vector.
+	//	   Any node can disconnect or reconnect at any clock tick. (this will be done in the network)
+	//     Only one node can run a query at each clock tick (???)
+		int clock = 0;
+		int endTime = 0;
+
+		bool queried;
+		int numDisconnect = 0;
+		int numReconnect = 0;
+
+		std::cout << "How long do you want to run the simulation? ";
+		std::cin >> endTime;
+
+		// simulation clock
+		for (; clock < endTime; clock++) {
+			queried = false;
+
+			numDisconnect = rand() % n1.getNodeMapSize();
+			numReconnect = rand() % n1.getSleepingNodeSize();
+
+		}
+
+
 	}
 
 
