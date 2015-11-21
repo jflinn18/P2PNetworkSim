@@ -14,7 +14,6 @@ class Network {
 private: 
 	map<int, Node*> nodeMap;
 	vector<Node*> sleepingNodes;
-	
 
 public: 
 	Network() {}
@@ -58,7 +57,7 @@ public:
 	}
 
 	void reconnectAllNodes() {
-		for (int i = sleepingNodes.size() - 1; i > 0; i--) {
+		for (int i = sleepingNodes.size() - 1; i >= 0; i--) {
 			nodeMap.insert(pair<int, Node*>(sleepingNodes[i]->getNodeID(), sleepingNodes[i]));
 			sleepingNodes.pop_back(); //remove the node from the sleeping nodes vector
 		}

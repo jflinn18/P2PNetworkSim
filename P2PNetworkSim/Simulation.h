@@ -9,9 +9,9 @@
 class Simulation {
 public: 
 
-	Simulation() { srand(time(NULL)); }
+	Simulation() {}
 
-	void checkDups(Network net, int redundancyRate) {
+	void checkDups(Network *net, int redundancyRate) {
 		map<unsigned int, int>::iterator it;
 		Node *n = NULL;
 		set<unsigned int> *localDatabase;
@@ -19,13 +19,14 @@ public:
 		// Makes sure that the max redundancy is met.
 		for (it = globalDatabase.begin(); it != globalDatabase.end(); it++) {
 			while (it->second != redundancyRate) {
-				n = net.getNode(rand() % (net.getNodeMapSize() - 1));
+				n = net->getNode(rand() % (net->getNodeMapSize() - 1));
 				localDatabase = n->getNodeDatabase();
 				if (localDatabase->find(it->first) == localDatabase->end()) {
 					localDatabase->insert(it->first);
 					it->second++;
 				}// endif
 			}//endwhile
+			cout << it->first << ": " << it->second << endl;
 		}//endfor
 	}
 
@@ -36,20 +37,20 @@ public:
 	void simOne(int initNetSize, int redundancyRateCap) {
 
 		//error checking...
-		if (redundancyRateCap > initNetSize) { redundancyRateCap = initNetSize; }
+		if (redundancyRateCap > initNetSize) { cout << "too big..." << endl; redundancyRateCap = initNetSize; }
 
 		vector<double> successRates;
-		Network n1;
+		Network *n1 = new Network();
 
 		for (int redundancy = 1; redundancy <= redundancyRateCap; redundancy++) {
 			clearGlobalDatabase();
 			// setup the initial network
 			for (int i = 0; i < initNetSize; i++) {
-				n1.addNode();
+				n1->addNode();
 			}
 			checkDups(n1, redundancy);
 
-			n1.printNodeMap();
+			//n1.printNodeMap();
 			
 			map<int, Node*>::iterator nodeIt;			//iterator to go through the nodemap
 			map<unsigned int, int>::iterator globalIt;	//iterator to go through the global database
@@ -57,23 +58,24 @@ public:
 
 			//probability of each node in the network disconnecting
 			for (int disconnection = 0; disconnection < 100; disconnection += 5) {
+				cout << "disconnection number: " << disconnection << endl;
 				//get network nodes
-				map<int, Node*> *myNodeMap = n1.getNodes();
+				map<int, Node*> *myNodeMap = n1->getNodes();
 				for (nodeIt = myNodeMap->begin(); nodeIt != myNodeMap->end(); nodeIt++) {
 					randProbability = rand() % 101; //get random number between 0 and 100
 					//disconnect node from network if it fits in the probability
-					if (randProbability <= disconnection) { n1.disconnectNode(nodeIt->first); }
+					if (randProbability <= disconnection) { n1->disconnectNode(nodeIt->first); }
 				}
 
 				int successfulQueries = 0;
 				//query distributed database for all items in the global database --> get a percentage of accurate query execution
 				for (globalIt = globalDatabase.begin(); globalIt != globalDatabase.end(); globalIt++) {
-					if (n1.queryDistributedDatabase(globalIt->first)) { successfulQueries++; }
+					if (n1->queryDistributedDatabase(globalIt->first)) { successfulQueries++; }
 				}
 
 				//add success rate to vector
 				successRates.push_back(static_cast<double>(successfulQueries) / static_cast<double>(globalDatabase.size()));
-				n1.reconnectAllNodes(); //puts all sleeping nodes back into the nodeMap
+				n1->reconnectAllNodes(); //puts all sleeping nodes back into the nodeMap
 			}
 		}
 
@@ -82,6 +84,8 @@ public:
 			cout << successRates[i] << endl;
 		}
 		cout << "end simulation 1 success rates." << endl;
+
+		delete n1;
 	}
 
 	// simTwo will be using a random disconnection probability and a fixed data redundancy rate
