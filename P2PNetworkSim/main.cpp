@@ -8,5 +8,5 @@
 int main() {
 	srand(time(NULL));
 	Simulation simulation;
-	simulation.simOne(3, 2);
+	simulation.simOne(20, 5);
 }

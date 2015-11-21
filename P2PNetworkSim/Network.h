@@ -24,6 +24,25 @@ public:
 		for (int i = 0; i < sleepingNodes.size(); i++) { delete sleepingNodes[i]; }
 	}
 
+	void checkDups(int redundancyRate) {
+		map<unsigned int, int>::iterator it;
+		Node *n = NULL;
+		set<unsigned int> *localDatabase;
+
+		// Makes sure that the max redundancy is met.
+		for (it = globalDatabase.begin(); it != globalDatabase.end(); it++) {
+			while (it->second != redundancyRate) {
+				n = getNode(rand() % (getNodeMapSize() - 1));
+				localDatabase = n->getNodeDatabase();
+				if (localDatabase->find(it->first) == localDatabase->end()) {
+					localDatabase->insert(it->first);
+					it->second++;
+				}// endif
+			}//endwhile
+			cout << it->first << ": " << it->second << endl;
+		}//endfor
+	}
+
 	// add a node to the network
 	void addNode() {
 		int name = nodeMap.size(); // the next node is the current size of the map
@@ -84,7 +103,7 @@ public:
 		}
 	}
 
-	map<int, Node*> *getNodes() {return &nodeMap;}
+	map<int, Node*> getNodes() {return nodeMap;}
 	Node* getNode(int nodeID) {return nodeMap[nodeID];}
 	int getNodeMapSize() { return nodeMap.size(); }
 	int getSleepingNodeSize() { return sleepingNodes.size(); }
