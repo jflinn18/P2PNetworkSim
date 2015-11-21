@@ -31,7 +31,7 @@ public:
 
 		// Makes sure that the max redundancy is met.
 		for (it = globalDatabase.begin(); it != globalDatabase.end(); it++) {
-			while (it->second != redundancyRate) {
+			while (it->second <= redundancyRate) {
 				n = getNode(rand() % (getNodeMapSize() - 1));
 				localDatabase = n->getNodeDatabase();
 				if (localDatabase->find(it->first) == localDatabase->end()) {

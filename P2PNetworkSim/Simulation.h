@@ -25,6 +25,7 @@ public:
 		for (int redundancy = 1; redundancy <= redundancyRateCap; redundancy++) {
 			cout << "redundancy rate: " << redundancy << endl;
 			clearGlobalDatabase();
+
 			// setup the initial network
 			for (int i = 0; i < initNetSize; i++) {
 				n1.addNode();
@@ -59,13 +60,13 @@ public:
 				successRates.push_back(static_cast<double>(successfulQueries) / static_cast<double>(globalDatabase.size()));
 				//n1.reconnectAllNodes(); //puts all sleeping nodes back into the nodeMap
 			}
+			cout << "Simulation 1 Success rates:" << endl;
+			for (int i = 0; i < successRates.size(); i++) {
+				cout << successRates[i] << endl;
+			}
+			cout << "end simulation 1 success rates." << endl;
+			successRates.clear();
 		}
-
-		cout << "Simulation 1 Success rates:" << endl;
-		for (int i = 0; i < successRates.size(); i++) {
-			cout << successRates[i] << endl;
-		}
-		cout << "end simulation 1 success rates." << endl;
 	}
 
 	// simTwo will be using a random disconnection probability and a fixed data redundancy rate

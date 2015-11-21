@@ -34,18 +34,7 @@ public:
 		// Filling the simulated database
 		for (int i = 1; i <= databaseSize; i++) {
 			toAdd = i*rand() % 10000;
-			if (globalDatabase.find(toAdd) != globalDatabase.end()) {
-				//if the number isn't unique, check if the global database has already met the max redundancy
-				if (globalDatabase[toAdd] < maxRedundancy) {
-					//if the number isn't in the local database
-					if (database.find(toAdd) != database.end())
-						//add the number to the local database
-						database.insert(toAdd);
-					else i--; //if the number is already in the database, decrement
-				}
-				globalDatabase[toAdd]++;
-			}
-			else {
+			if (globalDatabase.find(toAdd) == globalDatabase.end()) {
 				//if the number isn't in the global database, add it
 				globalDatabase.insert(pair<unsigned int, int>(toAdd, 1));
 				database.insert(toAdd);
