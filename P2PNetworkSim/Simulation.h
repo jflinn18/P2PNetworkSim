@@ -19,10 +19,11 @@ public:
 		//error checking...
 		if (redundancyRateCap > initNetSize) { cout << "too big..." << endl; redundancyRateCap = initNetSize; }
 
-		vector<double> successRates;
+		vector<pair<int, double>> successRates;
 		Network n1;
 
-		for (int redundancy = 1; redundancy <= redundancyRateCap; redundancy++) {
+		int redundancy = 1;
+		while (redundancy <= redundancyRateCap) {
 			cout << "redundancy rate: " << redundancy << endl;
 			clearGlobalDatabase();
 
@@ -33,20 +34,17 @@ public:
 
 			n1.checkDups(redundancy);
 
-			//n1.printNodeMap();
-			
 			map<int, Node*>::iterator nodeIt;			//iterator to go through the nodemap
 			map<unsigned int, int>::iterator globalIt;	//iterator to go through the global database
 			int randProbability;						//probability a node will disconnect from the network
 
-			//probability of each node in the network disconnecting
+														//probability of each node in the network disconnecting
 			for (int disconnection = 0; disconnection < 100; disconnection += 5) {
-				cout << "disconnection number: " << disconnection << endl;
 				//get network nodes
 				map<int, Node*> myNodeMap = n1.getNodes();
 				for (nodeIt = myNodeMap.begin(); nodeIt != myNodeMap.end(); nodeIt++) {
 					randProbability = rand() % 101; //get random number between 0 and 100
-					//disconnect node from network if it fits in the probability
+													//disconnect node from network if it fits in the probability
 					if (randProbability <= disconnection) { n1.disconnectNode(nodeIt->first); }
 				}
 
@@ -57,15 +55,16 @@ public:
 				}
 
 				//add success rate to vector
-				successRates.push_back(static_cast<double>(successfulQueries) / static_cast<double>(globalDatabase.size()));
+				successRates.push_back(pair<int, double>(disconnection, static_cast<double>(successfulQueries) / static_cast<double>(globalDatabase.size())));
 				//n1.reconnectAllNodes(); //puts all sleeping nodes back into the nodeMap
 			}
 			cout << "Simulation 1 Success rates:" << endl;
 			for (int i = 0; i < successRates.size(); i++) {
-				cout << successRates[i] << endl;
+				cout << successRates[i].first << ": " << successRates[i].second << endl;
 			}
 			cout << "end simulation 1 success rates." << endl;
 			successRates.clear();
+			redundancy++;
 		}
 	}
 

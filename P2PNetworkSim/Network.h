@@ -31,15 +31,29 @@ public:
 
 		// Makes sure that the max redundancy is met.
 		for (it = globalDatabase.begin(); it != globalDatabase.end(); it++) {
+			set<int> tries;
+			int nodeNum;
+
+			//while the global database has a count of less than the redundancyRate
 			while (it->second <= redundancyRate) {
-				n = getNode(rand() % (getNodeMapSize() - 1));
-				localDatabase = n->getNodeDatabase();
-				if (localDatabase->find(it->first) == localDatabase->end()) {
-					localDatabase->insert(it->first);
-					it->second++;
-				}// endif
+				nodeNum = rand() % getNodeMapSize(); //generate a random number to find a random node
+
+				//if the current nodeNum has not already been tried
+				if (tries.find(nodeNum) == tries.end()) {
+					tries.insert(nodeNum);	//insert the node num into the tries
+					n = getNode(nodeNum);	//get the random node
+					localDatabase = n->getNodeDatabase();	//get the database from the random node
+
+					//if the node does not already have this piece of data in its database
+					if (localDatabase->find(it->first) == localDatabase->end()) {
+						localDatabase->insert(it->first);	//insert the data into the local database
+						it->second++;						//increment the count on the local database
+					}// endif
+				}
+				else if (tries.size() >= nodeMap.size()){
+					break;
+				}
 			}//endwhile
-			cout << it->first << ": " << it->second << endl;
 		}//endfor
 	}
 
