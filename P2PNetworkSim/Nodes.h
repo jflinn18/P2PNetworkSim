@@ -23,6 +23,7 @@ private:
 	set<unsigned int> database;
 
 public:
+	
 	Node(int nodeID) { 
 		this->nodeID = nodeID; //assigns name to node
 
@@ -54,6 +55,13 @@ public:
 	
 	int getNodeID() { return nodeID; }
 	set<unsigned int>* getNodeDatabase() { return &database; }
+
+	void showLocalDatabase() {
+		set<unsigned int>::iterator it;
+		for (it = database.begin(); it != database.end(); it++) {
+			cout << *it << endl;
+		}
+	}
 };
 
 #endif

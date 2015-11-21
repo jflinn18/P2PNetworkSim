@@ -7,29 +7,11 @@
 
 
 class Simulation {
-private: 
-	Network n1;
-	Network n2;
-	int initNetSize;
-	int redundancyRate;
-
 public: 
 
-	Simulation(int initNetSize, int redundancyRate) {
-		if (initNetSize < redundancyRate) {
-			cout << "Redundancy Rate must be <= to initNetSize given the defn of Set\n";
-			exit(0);
-		}
-		this->initNetSize = initNetSize;
-		this->redundancyRate = redundancyRate;
-		srand(time(NULL));
-		
-	}
+	Simulation() { srand(time(NULL)); }
 
-	// runs one of the simulations given a choice. 
-	void runSimualtion() {}
-
-	void checkDups(Network net) {
+	void checkDups(Network net, int redundancyRate) {
 		map<unsigned int, int>::iterator it;
 		Node *n = NULL;
 		set<unsigned int> *localDatabase;
@@ -51,20 +33,55 @@ public:
 	// simOne will be running a simulation that takes a fixed diconnection probability 
 	//   and fixed data redundancy rate and shows the relationship
 	//	 we assume that only sleeping nodes will connect to the network after the simulation has begun, no new nodes
-	void simOne() {
-		clearGlobalDatabase();
+	void simOne(int initNetSize, int redundancyRateCap) {
 
-		// setup the initial network
-		for (int i = 0; i < initNetSize; i++) {
-			n1.addNode();
+		//error checking...
+		if (redundancyRateCap > initNetSize) { redundancyRateCap = initNetSize; }
+
+		vector<double> successRates;
+		Network n1;
+
+		for (int redundancy = 1; redundancy <= redundancyRateCap; redundancy++) {
+			clearGlobalDatabase();
+			// setup the initial network
+			for (int i = 0; i < initNetSize; i++) {
+				n1.addNode();
+			}
+			checkDups(n1, redundancy);
+
+			n1.printNodeMap();
+			
+			map<int, Node*>::iterator nodeIt;			//iterator to go through the nodemap
+			map<unsigned int, int>::iterator globalIt;	//iterator to go through the global database
+			int randProbability;						//probability a node will disconnect from the network
+
+			//probability of each node in the network disconnecting
+			for (int disconnection = 0; disconnection < 100; disconnection += 5) {
+				//get network nodes
+				map<int, Node*> *myNodeMap = n1.getNodes();
+				for (nodeIt = myNodeMap->begin(); nodeIt != myNodeMap->end(); nodeIt++) {
+					randProbability = rand() % 101; //get random number between 0 and 100
+					//disconnect node from network if it fits in the probability
+					if (randProbability <= disconnection) { n1.disconnectNode(nodeIt->first); }
+				}
+
+				int successfulQueries = 0;
+				//query distributed database for all items in the global database --> get a percentage of accurate query execution
+				for (globalIt = globalDatabase.begin(); globalIt != globalDatabase.end(); globalIt++) {
+					if (n1.queryDistributedDatabase(globalIt->first)) { successfulQueries++; }
+				}
+
+				//add success rate to vector
+				successRates.push_back(static_cast<double>(successfulQueries) / static_cast<double>(globalDatabase.size()));
+				n1.reconnectAllNodes(); //puts all sleeping nodes back into the nodeMap
+			}
 		}
-		checkDups(n1);
 
-		// two for-loops:
-		//		outer loop --> redundancy rate changing
-		//		inner loop --> disconnection rate increasing
-		//		
-		
+		cout << "Simulation 1 Success rates:" << endl;
+		for (int i = 0; i < successRates.size(); i++) {
+			cout << successRates[i] << endl;
+		}
+		cout << "end simulation 1 success rates." << endl;
 	}
 
 	// simTwo will be using a random disconnection probability and a fixed data redundancy rate
@@ -72,6 +89,13 @@ public:
 	void simTwo() {
 		clearGlobalDatabase();
 	// run simOne passing in a random disconnection probability
+
+
+		Network n1;
+		Network n2;
+		int initNetSize;
+		int redundancyRateCap;
+
 
 	// clock tick simulation
 	//     nodes can disconnect or reconnect or do nothing at each clock tick. 

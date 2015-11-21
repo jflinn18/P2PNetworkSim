@@ -57,11 +57,38 @@ public:
 			std::cout << "No nodes in sleepingNodes\n";
 	}
 
-	map<int, Node*> getNodes() {return nodeMap;}
+	void reconnectAllNodes() {
+		for (int i = sleepingNodes.size() - 1; i > 0; i--) {
+			nodeMap.insert(pair<int, Node*>(sleepingNodes[i]->getNodeID(), sleepingNodes[i]));
+			sleepingNodes.pop_back(); //remove the node from the sleeping nodes vector
+		}
+	}
+
+	bool queryDistributedDatabase(int data) {
+		map<int, Node*>::iterator nodeIt;
+		for (nodeIt = nodeMap.begin(); nodeIt != nodeMap.end(); nodeIt++) {
+			set<unsigned int> *localDatabase = nodeIt->second->getNodeDatabase();
+			
+			if (localDatabase->find(data) != localDatabase->end()) {
+				return true; //found the data!
+			}
+		}
+		return false; //didn't find the data...
+	}
+
+	void printNodeMap() {
+		map<int, Node*>::iterator it;
+		for (it = nodeMap.begin(); it != nodeMap.end(); it++) {
+			cout << "first: " << it->first << ", second: " << it->second << endl;
+			cout << "local database:" << endl;
+			it->second->showLocalDatabase();
+		}
+	}
+
+	map<int, Node*> *getNodes() {return &nodeMap;}
 	Node* getNode(int nodeID) {return nodeMap[nodeID];}
 	int getNodeMapSize() { return nodeMap.size(); }
 	int getSleepingNodeSize() { return sleepingNodes.size(); }
-
 };
 
 #endif

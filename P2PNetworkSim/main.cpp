@@ -4,8 +4,6 @@
 #include "Simulation.h"
 
 int main() {
-	Network network;
-
-	//Simulation simulation;
-
+	Simulation simulation;
+	simulation.simOne(20, 5);
 }
