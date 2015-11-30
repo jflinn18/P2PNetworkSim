@@ -119,6 +119,7 @@ public:
 
 	map<int, Node*> getNodes() {return nodeMap;}
 	Node* getNode(int nodeID) {return nodeMap[nodeID];}
+	Node* getSleepingNode(int index) { return sleepingNodes[index]; }
 	int getNodeMapSize() { return nodeMap.size(); }
 	int getSleepingNodeSize() { return sleepingNodes.size(); }
 };

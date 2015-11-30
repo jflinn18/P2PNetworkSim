@@ -21,6 +21,8 @@ class Node{
 private:
 	int nodeID;
 	set<unsigned int> database;
+	bool shouldReconnect;
+	bool shouldDisconnect;
 
 public:
 	
@@ -51,6 +53,9 @@ public:
 			cout << *it << endl;
 		}
 	}
+
+	void setShouldDisconnect(bool shouldDisconnect) { this->shouldDisconnect = shouldDisconnect; }
+	void setShouldReconnect(bool shouldReconnect) { this->shouldReconnect = shouldReconnect; }
 };
 
 #endif

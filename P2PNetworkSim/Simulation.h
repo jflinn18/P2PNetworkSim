@@ -28,11 +28,8 @@ public:
 			clearGlobalDatabase();
 
 			// setup the initial network
-			for (int i = 0; i < initNetSize; i++) {
-				n1.addNode();
-			}
-
-			n1.checkDups(redundancy);
+			for (int i = 0; i < initNetSize; i++) { n1.addNode(); } //make the network the size we want
+			n1.checkDups(redundancy);								//make redundancy rate accurate
 
 			map<int, Node*>::iterator nodeIt;			//iterator to go through the nodemap
 			map<unsigned int, int>::iterator globalIt;	//iterator to go through the global database
@@ -56,7 +53,6 @@ public:
 
 				//add success rate to vector
 				successRates.push_back(pair<int, double>(disconnection, static_cast<double>(successfulQueries) / static_cast<double>(globalDatabase.size())));
-				//n1.reconnectAllNodes(); //puts all sleeping nodes back into the nodeMap
 			}
 			cout << "Simulation 1 Success rates:" << endl;
 			for (int i = 0; i < successRates.size(); i++) {
@@ -70,38 +66,50 @@ public:
 
 	// simTwo will be using a random disconnection probability and a fixed data redundancy rate
 	//   and shows the relationship.
-	void simTwo() {
+	void simTwo(int initNetSize, int redundancyRate) {
 		clearGlobalDatabase();
-	// run simOne passing in a random disconnection probability
-
-
 		Network n1;
-		Network n2;
-		int initNetSize;
-		int redundancyRateCap;
 
+		// setup the initial network
+		for (int i = 0; i < initNetSize; i++) { n1.addNode(); } //make the network the size we want
+		n1.checkDups(redundancyRate);							//make redundancy rate accurate
 
-	// clock tick simulation
-	//     nodes can disconnect or reconnect or do nothing at each clock tick. 
-	//     nodes cannot reconnect if there are no nodes in the sleeping nodes vector.
-	//	   Any node can disconnect or reconnect at any clock tick. (this will be done in the network)
-	//     Only one node can run a query at each clock tick (???)
+		// clock tick simulation
+		//     nodes can disconnect or reconnect or do nothing at each clock tick. 
+		//     nodes cannot reconnect if there are no nodes in the sleeping nodes vector.
+		//	   Any node can disconnect or reconnect at any clock tick. (this will be done in the network)
+		//     Only one node can run a query at each clock tick (???)
+
 		int clock = 0;
 		int endTime = 0;
 
 		bool queried;
-		int numDisconnect = 0;
-		int numReconnect = 0;
+		int probDisconnect = 0;
+		int checkProbDisconnect = 0;
+		int probReconnect = 0;
+		int checkProbReconnect = 0;
 
 		std::cout << "How long do you want to run the simulation? ";
 		std::cin >> endTime;
+
+		std::map<int, Node*>::iterator it;
 
 		// simulation clock
 		for (; clock < endTime; clock++) {
 			queried = false;
 
-			numDisconnect = rand() % n1.getNodeMapSize();
-			numReconnect = rand() % n1.getSleepingNodeSize();
+			for (int i = 0; i < n1.getSleepingNodeSize(); i++) {
+				probReconnect = rand() % 101;
+				checkProbReconnect = rand() % 101;
+				if (checkProbReconnect <= probReconnect) { n1.getSleepingNode(i)->setShouldReconnect(true); } //flag that notifies if the node should disconnect
+			}
+
+			//TODO: actually reconnect nodes that have the flag set
+			//	randomly disconnect nodes from nodeMap
+
+
+
+
 
 		}
 
