@@ -9,7 +9,7 @@
 
 using namespace std;
 
-map<unsigned int, int> globalDatabase;
+map<unsigned int, int> globalDatabase; // <data, redundancyRate>  If you can't remeber what this means, just stop it.
 int maxRedundancy = 1;
 
 void clearGlobalDatabase() {
@@ -21,8 +21,7 @@ class Node{
 private:
 	int nodeID;
 	set<unsigned int> database;
-	bool shouldReconnect;
-	bool shouldDisconnect;
+	bool rdFlag;
 
 public:
 	
@@ -54,8 +53,8 @@ public:
 		}
 	}
 
-	void setShouldDisconnect(bool shouldDisconnect) { this->shouldDisconnect = shouldDisconnect; }
-	void setShouldReconnect(bool shouldReconnect) { this->shouldReconnect = shouldReconnect; }
+	void setRDFlag(bool flag) { this->rdFlag = flag; }
+	bool getRDFlag() { return rdFlag; }
 };
 
 #endif

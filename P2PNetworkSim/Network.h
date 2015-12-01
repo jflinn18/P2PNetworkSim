@@ -69,6 +69,7 @@ public:
 	void disconnectNode(int nameID) {
 		if (nodeMap[nameID]) {  // checks to make sure the node is in the network. 
 			sleepingNodes.push_back(nodeMap[nameID]);
+			nodeMap[nameID]->setRDFlag(false);
 			nodeMap.erase(nameID);
 		}
 		else
@@ -76,17 +77,19 @@ public:
 	}
 
 	// "reconnects" a node by moving it from the sleepingNodes to the nodeMap
-	void reconnectNode() {
+	void reconnectNode(int index) {
 		if (sleepingNodes.size() != 0) {
-			int randNode = rand() % sleepingNodes.size();
+			//int randNode = rand() % sleepingNodes.size();
 			
-			nodeMap.insert(pair<int, Node*>(sleepingNodes[randNode]->getNodeID(), sleepingNodes[randNode]));
+			nodeMap.insert(pair<int, Node*>(sleepingNodes[index]->getNodeID(), sleepingNodes[index]));
+			sleepingNodes[index]->setRDFlag(false);
 
 			// make sure that this is erasing the index that is being used above
-			sleepingNodes.erase(sleepingNodes.begin() + randNode);
+			sleepingNodes.erase(sleepingNodes.begin() + index);
+
 		}
 		else
-			std::cout << "No nodes in sleepingNodes\n";
+			std::cout << "Node not in sleepingNodes\n";
 	}
 
 	void reconnectAllNodes() {
@@ -117,7 +120,7 @@ public:
 		}
 	}
 
-	map<int, Node*> getNodes() {return nodeMap;}
+	map<int, Node*>* getNodes() {return &nodeMap;}
 	Node* getNode(int nodeID) {return nodeMap[nodeID];}
 	Node* getSleepingNode(int index) { return sleepingNodes[index]; }
 	int getNodeMapSize() { return nodeMap.size(); }

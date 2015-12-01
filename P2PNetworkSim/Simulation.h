@@ -4,7 +4,7 @@
 #include "Network.h"
 #include <stdlib.h>
 #include <time.h>
-
+#include <iterator>
 
 class Simulation {
 public: 
@@ -38,8 +38,8 @@ public:
 														//probability of each node in the network disconnecting
 			for (int disconnection = 0; disconnection < 100; disconnection += 5) {
 				//get network nodes
-				map<int, Node*> myNodeMap = n1.getNodes();
-				for (nodeIt = myNodeMap.begin(); nodeIt != myNodeMap.end(); nodeIt++) {
+				map<int, Node*> *myNodeMap = n1.getNodes();
+				for (nodeIt = myNodeMap->begin(); nodeIt != myNodeMap->end(); nodeIt++) {
 					randProbability = rand() % 101; //get random number between 0 and 100
 													//disconnect node from network if it fits in the probability
 					if (randProbability <= disconnection) { n1.disconnectNode(nodeIt->first); }
@@ -71,7 +71,9 @@ public:
 		Network n1;
 
 		// setup the initial network
-		for (int i = 0; i < initNetSize; i++) { n1.addNode(); } //make the network the size we want
+		for (int i = 0; i < initNetSize; i++) { 
+			n1.addNode(); 
+		} //make the network the size we want
 		n1.checkDups(redundancyRate);							//make redundancy rate accurate
 
 		// clock tick simulation
@@ -83,37 +85,81 @@ public:
 		int clock = 0;
 		int endTime = 0;
 
-		bool queried;
 		int probDisconnect = 0;
 		int checkProbDisconnect = 0;
 		int probReconnect = 0;
 		int checkProbReconnect = 0;
 
-		std::cout << "How long do you want to run the simulation? ";
+		unsigned int data = 0;            // This is the data that is being queried for
+		int dataSize = 0;                 // This is the randomness of data to query for
+		int querySuccesses = 0;
+
+		std::cout << "How many clock ticks? ";
 		std::cin >> endTime;
 
 		std::map<int, Node*>::iterator it;
+		std::map<int, Node*> *nodeMap;
 
 		// simulation clock
 		for (; clock < endTime; clock++) {
-			queried = false;
+			
+			nodeMap = n1.getNodes();
 
+			//flag all of the nodes that should be reconnected
 			for (int i = 0; i < n1.getSleepingNodeSize(); i++) {
 				probReconnect = rand() % 101;
 				checkProbReconnect = rand() % 101;
-				if (checkProbReconnect <= probReconnect) { n1.getSleepingNode(i)->setShouldReconnect(true); } //flag that notifies if the node should disconnect
+				if (checkProbReconnect <= probReconnect) { n1.getSleepingNode(i)->setRDFlag(true); } //flag that notifies if the node should disconnect
 			}
 
+			//flag all of the nodes that should be disconnected
+			for (it = nodeMap->begin(); it != nodeMap->end(); it++) {
+				probDisconnect = rand() % 101;
+				checkProbDisconnect = rand() % 101;
+				if (checkProbDisconnect <= probDisconnect) { it->second->setRDFlag(true); }
+			}
 			//TODO: actually reconnect nodes that have the flag set
 			//	randomly disconnect nodes from nodeMap
 
+			//reconnects the flagged nodes
+			int size = n1.getSleepingNodeSize();
+			for (int i = 0; i < size; i++) {
+				if (n1.getSleepingNode(i)->getRDFlag()) {
+					n1.reconnectNode(i);
+					i--;
+					size--;
+				}
+			}
 
+			//disconnects the flagged nodes
+			it = nodeMap->begin();
+			while (it != nodeMap->end()) {
+				if (it->second->getRDFlag()) {
+					std::map<int, Node*>::iterator toErase = it;
+					++it;
+					n1.disconnectNode(toErase->first);
+				}
+				else {
+					++it;
+				}
+			}
 
+			dataSize = rand() % globalDatabase.size();
+			std::map<unsigned int, int>::iterator itGlobal;
 
+			itGlobal = globalDatabase.begin();
+			for (int i = 0; i < dataSize; i++) {
+				itGlobal++;
+			}
 
-		}
+			data = itGlobal->first;
+			if (n1.queryDistributedDatabase(data)) {
+				querySuccesses++;
+			}
+				
+		} // end for 'clock'
 
-
+		std::cout << "Stats: " << (double)querySuccesses / (double)endTime << std::endl;   // endTime is the number of queries that we ran.
 	}
 
 
