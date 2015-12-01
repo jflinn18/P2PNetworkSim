@@ -35,7 +35,7 @@ public:
 			int nodeNum;
 
 			//while the global database has a count of less than the redundancyRate
-			while (it->second <= redundancyRate) {
+			while (it->second < redundancyRate) {
 				nodeNum = rand() % getNodeMapSize(); //generate a random number to find a random node
 
 				//if the current nodeNum has not already been tried

@@ -20,14 +20,13 @@ public:
 		if (redundancyRateCap > initNetSize) { cout << "too big..." << endl; redundancyRateCap = initNetSize; }
 
 		vector<pair<int, double>> successRates;
-		Network n1;
 
 		int redundancy = 1;
 		while (redundancy <= redundancyRateCap) {
 
 			cout << "redundancy rate: " << redundancy << endl;
 			clearGlobalDatabase();
-
+			Network n1;
 			// setup the initial network
 			for (int i = 0; i < initNetSize; i++) { n1.addNode(); } //make the network the size we want
 			n1.checkDups(redundancy);								//make redundancy rate accurate
@@ -39,12 +38,16 @@ public:
 														//probability of each node in the network disconnecting
 			for (int disconnection = 0; disconnection < 100; disconnection += 5) {
 
+				if (disconnection >= 90 && redundancy == 10) {
+					std::cout << std::endl;
+				}
+
 				//get network nodes
 				map<int, Node*> *myNodeMap = n1.getNodes();
 				std::map<int, Node*>::iterator it = myNodeMap->begin();
 				while (it != myNodeMap->end()) {
 					randProbability = rand() % 101; //get random number between 0 and 100
-					if (randProbability <= disconnection) {
+					if (randProbability < disconnection) {
 						std::map<int, Node*>::iterator toErase = it;
 						++it;
 						//disconnect node from network if it fits in the probability
