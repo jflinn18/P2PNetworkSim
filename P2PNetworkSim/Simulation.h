@@ -24,6 +24,7 @@ public:
 
 		int redundancy = 1;
 		while (redundancy <= redundancyRateCap) {
+
 			cout << "redundancy rate: " << redundancy << endl;
 			clearGlobalDatabase();
 
@@ -37,12 +38,21 @@ public:
 
 														//probability of each node in the network disconnecting
 			for (int disconnection = 0; disconnection < 100; disconnection += 5) {
+
 				//get network nodes
 				map<int, Node*> *myNodeMap = n1.getNodes();
-				for (nodeIt = myNodeMap->begin(); nodeIt != myNodeMap->end(); nodeIt++) {
+				std::map<int, Node*>::iterator it = myNodeMap->begin();
+				while (it != myNodeMap->end()) {
 					randProbability = rand() % 101; //get random number between 0 and 100
-													//disconnect node from network if it fits in the probability
-					if (randProbability <= disconnection) { n1.disconnectNode(nodeIt->first); }
+					if (randProbability <= disconnection) {
+						std::map<int, Node*>::iterator toErase = it;
+						++it;
+						//disconnect node from network if it fits in the probability
+						n1.disconnectNode(toErase->first);
+					}
+					else {
+						++it;
+					}
 				}
 
 				int successfulQueries = 0;
@@ -53,6 +63,8 @@ public:
 
 				//add success rate to vector
 				successRates.push_back(pair<int, double>(disconnection, static_cast<double>(successfulQueries) / static_cast<double>(globalDatabase.size())));
+
+				n1.reconnectAllNodes(); //empty sleeping nodes because it's a pointer
 			}
 			cout << "Simulation 1 Success rates:" << endl;
 			for (int i = 0; i < successRates.size(); i++) {
