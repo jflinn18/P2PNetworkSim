@@ -70,8 +70,9 @@ public:
 				n1.reconnectAllNodes(); //empty sleeping nodes because it's a pointer
 			}
 			cout << "Simulation 1 Success rates:" << endl;
+			cout << "RR Disc SucsRate\n";
 			for (int i = 0; i < successRates.size(); i++) {
-				cout << successRates[i].first << ": " << successRates[i].second << endl;
+				cout << redundancy << ' ' << successRates[i].first << " " << successRates[i].second << endl;
 			}
 			cout << "end simulation 1 success rates." << endl;
 			successRates.clear();

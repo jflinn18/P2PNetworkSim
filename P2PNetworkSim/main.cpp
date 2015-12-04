@@ -26,6 +26,10 @@ int main() {
 		exit(0);
 	}
 
+	std::cout << std::endl;
+	std::cout << "Size of Network: " << netSize << std::endl;
+	std::cout << "Data Redundancy Rate: " << dataRedundancy << std::endl;
+
 	if (resp == "One" || resp == "one")
 		simulation.simOne(netSize, dataRedundancy);
 	else if (resp == "Two" || resp == "two")
